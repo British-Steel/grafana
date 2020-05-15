@@ -114,6 +114,8 @@ export type IconName =
   | 'favorite'
   | 'line-alt'
   | 'sort-amount-down'
+  | 'sun'
+  | 'moon'
   | 'cloud';
 
 export const getAvailableIcons = (): IconName[] => [
@@ -227,5 +229,7 @@ export const getAvailableIcons = (): IconName[] => [
   'ellipsis-v',
   'favorite',
   'sort-amount-down',
+  'sun',
+  'moon',
   'cloud',
 ];
