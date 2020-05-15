@@ -13,7 +13,7 @@ import { stylesFactory } from '../../themes/stylesFactory';
 import { withTheme, useTheme } from '../../themes/ThemeContext';
 
 // Types
-import { isDateTime, rangeUtil, GrafanaTheme, dateTimeFormat, timeZoneFormatUserFriendly } from '@grafana/data';
+import { rangeUtil, GrafanaTheme, dateTimeFormat, timeZoneFormatUserFriendly } from '@grafana/data';
 import { TimeRange, TimeOption, TimeZone, dateMath } from '@grafana/data';
 import { Themeable } from '../../types';
 
@@ -143,7 +143,7 @@ export class UnthemedTimeRangePicker extends PureComponent<Props, State> {
 
     const { isOpen } = this.state;
     const styles = getStyles(theme);
-    const hasAbsolute = isDateTime(value.raw.from) || isDateTime(value.raw.to);
+    const hasAbsolute = true;
     const syncedTimePicker = timeSyncButton && isSynced;
     const timePickerIconClass = cx({ ['icon-brand-gradient']: syncedTimePicker });
     const timePickerButtonClass = cx('btn navbar-button navbar-button--tight', {
