@@ -21,7 +21,15 @@ export const DashboardLinks: FC<Props> = ({ dashboard }) => {
           const key = `${link.title}-$${index}`;
 
           if (link.asDropdown) {
-            return <DashboardsDropdown key={key} link={link} linkInfo={linkInfo} dashboardId={dashboard.id} />;
+            return (
+              <DashboardsDropdown
+                key={key}
+                link={link}
+                linkInfo={linkInfo}
+                excludeCurrent={link.excludeCurrent}
+                dashboardId={dashboard.id}
+              />
+            );
           }
 
           const linkElement = (

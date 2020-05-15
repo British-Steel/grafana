@@ -42,6 +42,7 @@ export interface DashboardLink {
   type: DashboardLinkType;
   url: string;
   asDropdown: boolean;
+  excludeCurrent: boolean;
   tags: [];
   searchHits?: [];
   target: string;
