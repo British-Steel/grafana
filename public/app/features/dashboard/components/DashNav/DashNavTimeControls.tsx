@@ -100,6 +100,13 @@ class UnthemedDashNavTimeControls extends Component<Props> {
     const timeZone = dashboard.getTimezone();
     const styles = getStyles(theme);
 
+    // If range>1 day, don't allow refresh interval to be set, kills datasource
+    let refresh = dashboard.refresh;
+    if (timePickerValue.to.valueOf() - timePickerValue.from.valueOf() > 86400000) {
+      refresh = 'Off';
+      getTimeSrv().setAutoRefresh('');
+    }
+
     return (
       <div className={styles.container}>
         <TimePickerWithHistory
@@ -113,7 +120,7 @@ class UnthemedDashNavTimeControls extends Component<Props> {
         <RefreshPicker
           onIntervalChanged={this.onChangeRefreshInterval}
           onRefresh={this.onRefresh}
-          value={dashboard.refresh}
+          value={refresh}
           intervals={intervals}
           tooltip="Refresh dashboard"
         />
