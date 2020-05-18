@@ -23,7 +23,7 @@ export class ResetPasswordCtrl {
       main: {
         icon: 'grafana',
         text: 'Reset Password',
-        subTitle: 'Reset your Grafana password',
+        subTitle: 'Reset your PCC MI password',
         breadcrumbs: [{ title: 'Login', url: 'login' }],
       },
     };
