@@ -13,6 +13,7 @@ import { updateLocation } from 'app/core/actions';
 
 // Components
 import { RefreshPicker, withTheme, stylesFactory, Themeable } from '@grafana/ui';
+import { DefaultTimeButton } from './DefaultTimeButton';
 import { TimePickerWithHistory } from 'app/core/components/TimePicker/TimePickerWithHistory';
 
 // Utils & Services
@@ -91,8 +92,13 @@ class UnthemedDashNavTimeControls extends Component<Props> {
     appEvents.emit(CoreEvents.zoomOut, 2);
   };
 
+  onDefaultTimeRange = () => {
+    appEvents.emit(CoreEvents.defaultTime);
+  };
+
   render() {
     const { dashboard, theme } = this.props;
+    const defaultTimeButton = <DefaultTimeButton onClick={this.onDefaultTimeRange} />;
     const { refresh_intervals } = dashboard.timepicker;
     const intervals = getTimeSrv().getValidIntervals(refresh_intervals || defaultIntervals);
 
@@ -116,6 +122,7 @@ class UnthemedDashNavTimeControls extends Component<Props> {
           onMoveBackward={this.onMoveBack}
           onMoveForward={this.onMoveForward}
           onZoom={this.onZoom}
+          defaultTimeButton={defaultTimeButton}
         />
         <RefreshPicker
           onIntervalChanged={this.onChangeRefreshInterval}

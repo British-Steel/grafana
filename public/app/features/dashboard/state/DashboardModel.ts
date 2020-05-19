@@ -128,6 +128,7 @@ export class DashboardModel {
 
     this.resetOriginalVariables(true);
     this.resetOriginalTime();
+    this.getOriginalTime();
 
     this.initMeta(meta);
     this.updateSchema(data);
@@ -959,6 +960,10 @@ export class DashboardModel {
 
   resetOriginalTime() {
     this.originalTime = _.cloneDeep(this.time);
+  }
+
+  getOriginalTime() {
+    return _.cloneDeep(this.originalTime);
   }
 
   hasTimeChanged() {

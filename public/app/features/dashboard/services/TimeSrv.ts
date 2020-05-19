@@ -45,6 +45,7 @@ export class TimeSrv {
     this.time = DefaultTimeRange.raw;
 
     appEvents.on(CoreEvents.zoomOut, this.zoomOut.bind(this));
+    appEvents.on(CoreEvents.defaultTime, this.defaultTime.bind(this));
     appEvents.on(CoreEvents.shiftTime, this.shiftTime.bind(this));
     $rootScope.$on('$routeUpdate', this.routeUpdated.bind(this));
 
@@ -298,6 +299,24 @@ export class TimeSrv {
     const { from, to } = getZoomedTimeRange(range, factor);
 
     this.setTime({ from: toUtc(from), to: toUtc(to) });
+  }
+
+  defaultTime() {
+    this.time = this.dashboard.getOriginalTime();
+    this.parseTime();
+    this.timeAtLoad = _.cloneDeep(this.time);
+    this.setTime(this.time, false);
+
+    this.$timeout(() => {
+      const params = this.$location.search();
+      if (params.from) {
+        delete params.from;
+      }
+      if (params.to) {
+        delete params.to;
+      }
+      this.$location.search(params);
+    });
   }
 
   shiftTime(direction: number) {

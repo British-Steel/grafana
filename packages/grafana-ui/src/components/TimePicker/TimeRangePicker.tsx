@@ -97,6 +97,7 @@ export interface Props extends Themeable {
   timeZone?: TimeZone;
   timeSyncButton?: JSX.Element;
   isSynced?: boolean;
+  defaultTimeButton?: JSX.Element;
   onChange: (timeRange: TimeRange) => void;
   onMoveBackward: () => void;
   onMoveForward: () => void;
@@ -137,6 +138,7 @@ export class UnthemedTimeRangePicker extends PureComponent<Props, State> {
       timeZone,
       timeSyncButton,
       isSynced,
+      defaultTimeButton,
       theme,
       history,
     } = this.props;
@@ -194,6 +196,8 @@ export class UnthemedTimeRangePicker extends PureComponent<Props, State> {
               <Icon name="search-minus" size="lg" />
             </button>
           </Tooltip>
+
+          {defaultTimeButton}
         </div>
       </div>
     );
