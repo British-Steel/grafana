@@ -31,13 +31,13 @@ export function DefaultTimeButton(props: DefaultTimeButtonProps) {
   const theme = useTheme();
   const styles = getStyles(theme);
 
-  const syncTimesTooltip = () => {
+  const defaultTimeTooltip = () => {
     const tooltip = "Return to this dashboard's default time range";
     return <>{tooltip}</>;
   };
 
   return (
-    <Tooltip content={syncTimesTooltip} placement="bottom">
+    <Tooltip content={defaultTimeTooltip} placement="bottom">
       <button
         className={classNames('btn navbar-button navbar-button--attached')}
         aria-label="Default time"
