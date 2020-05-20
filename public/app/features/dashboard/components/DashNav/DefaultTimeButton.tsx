@@ -32,7 +32,7 @@ export function DefaultTimeButton(props: DefaultTimeButtonProps) {
   const styles = getStyles(theme);
 
   const syncTimesTooltip = () => {
-    const tooltip = "Return to this dashbaord's default time range";
+    const tooltip = "Return to this dashboard's default time range";
     return <>{tooltip}</>;
   };
 
