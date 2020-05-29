@@ -36,6 +36,7 @@ export class QueryVariable implements QueryVariableModel, VariableActions {
   refresh: VariableRefresh;
   multi: boolean;
   includeAll: boolean;
+  timeControl: boolean;
   useTags: boolean;
   tagsQuery: string;
   tagValuesQuery: string;
@@ -57,6 +58,7 @@ export class QueryVariable implements QueryVariableModel, VariableActions {
     refresh: VariableRefresh.never,
     multi: false,
     includeAll: false,
+    timeControl: false,
     allValue: null,
     options: [],
     current: {} as VariableOption,
@@ -164,6 +166,11 @@ export class QueryVariable implements QueryVariableModel, VariableActions {
     }
 
     return datasource.metricFindQuery(query, options);
+  }
+
+  timeControlSelected() {
+    this.multi = false;
+    this.includeAll = false;
   }
 
   addAllOption() {

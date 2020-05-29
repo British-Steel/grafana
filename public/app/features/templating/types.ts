@@ -83,6 +83,7 @@ export interface ConstantVariableModel extends VariableWithOptions {}
 export interface VariableWithMultiSupport extends VariableWithOptions {
   multi: boolean;
   includeAll: boolean;
+  timeControl?: boolean;
   allValue?: string | null;
 }
 

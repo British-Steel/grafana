@@ -28,6 +28,13 @@ export const SelectionOptionsEditor: FunctionComponent<SelectionOptionsEditorPro
     [props.onPropChange]
   );
 
+  const onTimeControlChanged = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      props.onPropChange({ propName: 'timeControl', propValue: event.target.checked });
+    },
+    [props.onPropChange]
+  );
+
   const onAllValueChanged = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       props.onPropChange({ propName: 'allValue', propValue: event.target.value });
@@ -40,24 +47,37 @@ export const SelectionOptionsEditor: FunctionComponent<SelectionOptionsEditorPro
       <div className="section">
         <div aria-label={selectors.pages.Dashboard.Settings.Variables.Edit.General.selectionOptionsMultiSwitch}>
           <Switch
-            label="Multi-value"
+            label="Time Control"
             labelClass="width-10"
-            checked={props.variable.multi}
-            onChange={onMultiChanged}
-            tooltip={'Enables multiple values to be selected at the same time'}
+            checked={props.variable.timeControl}
+            onChange={onTimeControlChanged}
+            tooltip={'Variable will be used to control time selection'}
           />
         </div>
-        <div aria-label={selectors.pages.Dashboard.Settings.Variables.Edit.General.selectionOptionsIncludeAllSwitch}>
-          <Switch
-            label="Include All option"
-            labelClass="width-10"
-            checked={props.variable.includeAll}
-            onChange={onIncludeAllChanged}
-            tooltip={'Enables multiple values to be selected at the same time'}
-          />
-        </div>
+        {!props.variable.timeControl && (
+          <div aria-label={selectors.pages.Dashboard.Settings.Variables.Edit.General.selectionOptionsMultiSwitch}>
+            <Switch
+              label="Multi-value"
+              labelClass="width-10"
+              checked={props.variable.multi}
+              onChange={onMultiChanged}
+              tooltip={'Enables multiple values to be selected at the same time'}
+            />
+          </div>
+        )}
+        {!props.variable.timeControl && (
+          <div aria-label={selectors.pages.Dashboard.Settings.Variables.Edit.General.selectionOptionsIncludeAllSwitch}>
+            <Switch
+              label="Include All option"
+              labelClass="width-10"
+              checked={props.variable.includeAll}
+              onChange={onIncludeAllChanged}
+              tooltip={'Enables multiple values to be selected at the same time'}
+            />
+          </div>
+        )}
       </div>
-      {props.variable.includeAll && (
+      {props.variable.includeAll && !props.variable.timeControl && (
         <div className="gf-form">
           <span className="gf-form-label width-10">Custom all value</span>
           <input
