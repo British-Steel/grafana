@@ -12,6 +12,7 @@ import { CoreEvents } from 'app/types';
 import { GrafanaRootScope } from 'app/routes/GrafanaCtrl';
 import { AppEvents, locationUtil, TimeZone } from '@grafana/data';
 import { promiseToDigest } from '../../../../core/utils/promiseToDigest';
+import './panels';
 
 export class SettingsCtrl {
   dashboard: DashboardModel;
@@ -86,6 +87,11 @@ export class SettingsCtrl {
         title: 'Links',
         id: 'links',
         icon: 'link',
+      });
+      this.sections.push({
+        title: 'Panels',
+        id: 'panels',
+        icon: 'apps',
       });
     }
 
