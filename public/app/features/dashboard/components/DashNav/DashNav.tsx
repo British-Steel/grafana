@@ -333,22 +333,11 @@ class DashNav extends PureComponent<Props> {
 
         {!dashboard.timepicker.hidden && (
           <div className="navbar-buttons">
-            {/* {!this.props.location.timeLocked && ( */}
             {!this.isTimeLocked && (
-              <DashNavButton
-                tooltip="Go to next dashboard"
-                classSuffix="tight"
-                icon="unlock"
-                onClick={this.onTimeLock}
-              />
+              <DashNavButton tooltip="Lock time range" classSuffix="tight" icon="unlock" onClick={this.onTimeLock} />
             )}
             {this.isTimeLocked && (
-              <DashNavButton
-                tooltip="Go to next dashboard"
-                classSuffix="locked"
-                icon="lock"
-                onClick={this.onTimeUnlock}
-              />
+              <DashNavButton tooltip="Unlock time range" classSuffix="locked" icon="lock" onClick={this.onTimeUnlock} />
             )}
             <DashNavTimeControls dashboard={dashboard} location={location} updateLocation={updateLocation} />
           </div>
