@@ -1,5 +1,5 @@
 import castArray from 'lodash/castArray';
-import { AppEvents, TimeRange, UrlQueryMap, UrlQueryValue } from '@grafana/data';
+import { AppEvents, TimeRange, UrlQueryMap, UrlQueryValue, dateTime } from '@grafana/data';
 import angular from 'angular';
 
 import {
@@ -357,7 +357,13 @@ export const variableUpdated = (
 ): ThunkResult<Promise<void>> => {
   return (dispatch, getState) => {
     // if there is a variable lock ignore cascading update because we are in a boot up scenario
-    const variable = getVariable(identifier.id!, getState());
+    const variable = getVariable<VariableWithMultiSupport>(identifier.id!, getState());
+    // assumes timeControl variable in form yyyy-mm-ddd hh:mm:ss to yyyy-mm-ddd hh:mm:ss
+    if (variable.timeControl) {
+      const rangeFrom = dateTime(variable.current.text.slice(0, 19)).unix() * 1000;
+      const rangeTo = dateTime(variable.current.text.slice(-19)).unix() * 1000;
+      dispatch(updateLocation({ query: { from: rangeFrom, to: rangeTo }, partial: true }));
+    }
     if (variable.initLock) {
       return Promise.resolve();
     }

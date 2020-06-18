@@ -89,6 +89,10 @@
   <dash-links-editor dashboard="ctrl.dashboard"></dash-links-editor>
 </div>
 
+<div class="dashboard-settings__content" ng-if="ctrl.viewId === 'panels'">
+  <dash-panels-editor dashboard="ctrl.dashboard"></dash-panels-editor>
+</div>
+
 <div class="dashboard-settings__content" ng-if="ctrl.viewId === 'versions'">
   <gf-dashboard-history dashboard="dashboard"></gf-dashboard-history>
 </div>
