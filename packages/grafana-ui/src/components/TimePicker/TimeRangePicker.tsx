@@ -103,6 +103,7 @@ export interface Props extends Themeable {
   onMoveForward: () => void;
   onZoom: () => void;
   history?: TimeRange[];
+  isLocked?: boolean;
 }
 
 export interface State {
@@ -120,9 +121,11 @@ export class UnthemedTimeRangePicker extends PureComponent<Props, State> {
   };
 
   onOpen = (event: FormEvent<HTMLButtonElement>) => {
-    const { isOpen } = this.state;
-    event.stopPropagation();
-    this.setState({ isOpen: !isOpen });
+    if (!this.props.isLocked) {
+      const { isOpen } = this.state;
+      event.stopPropagation();
+      this.setState({ isOpen: !isOpen });
+    }
   };
 
   onClose = () => {

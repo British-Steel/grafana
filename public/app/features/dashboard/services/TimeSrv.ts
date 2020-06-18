@@ -21,6 +21,7 @@ import { GrafanaRootScope } from 'app/routes/GrafanaCtrl';
 import { getZoomedTimeRange, getShiftedTimeRange } from 'app/core/utils/timePicker';
 import { appEvents } from '../../../core/core';
 import { CoreEvents } from '../../../types';
+import store from 'app/core/store';
 
 import { config } from 'app/core/config';
 
@@ -65,6 +66,7 @@ export class TimeSrv {
     this.refresh = dashboard.refresh;
 
     this.initTimeFromUrl();
+    this.initTimeFromTimeLock();
     this.parseTime();
 
     // remember time at load so we can go back to it
@@ -167,6 +169,12 @@ export class TimeSrv {
     }
   }
 
+  private initTimeFromTimeLock() {
+    if (store.getBool('grafana.dashNav.timeLocked', false)) {
+      this.time = store.getObject('grafana.dashNav.timeLocked.time');
+    }
+  }
+
   private routeUpdated() {
     const params = this.$location.search();
     if (params.left) {
@@ -242,6 +250,9 @@ export class TimeSrv {
   }
 
   setTime(time: RawTimeRange, fromRouteUpdate?: boolean) {
+    if (store.getBool('grafana.dashNav.timeLocked', false)) {
+      return; // time locked
+    }
     _.extend(this.time, time);
 
     // disable refresh if zoom in or zoom out
@@ -302,6 +313,9 @@ export class TimeSrv {
   }
 
   defaultTime() {
+    if (store.getBool('grafana.dashNav.timeLocked', false)) {
+      return; // time locked
+    }
     this.time = this.dashboard.getOriginalTime();
     this.parseTime();
     this.timeAtLoad = _.cloneDeep(this.time);

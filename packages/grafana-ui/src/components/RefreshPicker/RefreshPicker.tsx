@@ -33,6 +33,7 @@ export interface Props {
   refreshButton?: React.ReactNode;
   buttonSelectClassName?: string;
   theme: GrafanaTheme;
+  refreshOff?: boolean;
 }
 
 export class RefreshPickerBase extends PureComponent<Props> {
@@ -65,8 +66,20 @@ export class RefreshPickerBase extends PureComponent<Props> {
   };
 
   render() {
-    const { onRefresh, intervals, tooltip, value, refreshButton, buttonSelectClassName, theme } = this.props;
-    const options = this.intervalsToOptions(intervals);
+    const {
+      onRefresh,
+      intervals,
+      tooltip,
+      value,
+      refreshButton,
+      buttonSelectClassName,
+      theme,
+      refreshOff,
+    } = this.props;
+    let options = this.intervalsToOptions(intervals);
+    if (refreshOff) {
+      options = [RefreshPicker.offOption];
+    }
     const currentValue = value || '';
     const selectedValue = options.find(item => item.value === currentValue) || RefreshPicker.offOption;
     const styles = getStyles(theme);

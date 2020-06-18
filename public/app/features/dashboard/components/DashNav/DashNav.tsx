@@ -5,6 +5,7 @@ import { css } from 'emotion';
 // Utils & Services
 import { appEvents } from 'app/core/app_events';
 import { PlaylistSrv } from 'app/features/playlist/playlist_srv';
+import { getTimeSrv } from 'app/features/dashboard/services/TimeSrv';
 // Components
 import { DashNavButton } from './DashNavButton';
 import { DashNavTimeControls } from './DashNavTimeControls';
@@ -13,6 +14,7 @@ import { textUtil } from '@grafana/data';
 import { BackButton } from 'app/core/components/BackButton/BackButton';
 // State
 import { updateLocation } from 'app/core/actions';
+import store from 'app/core/store';
 // Types
 import { DashboardModel } from '../../state';
 import { CoreEvents, StoreState } from 'app/types';
@@ -52,10 +54,12 @@ type Props = StateProps & OwnProps;
 
 class DashNav extends PureComponent<Props> {
   playlistSrv: PlaylistSrv;
+  isTimeLocked: boolean;
 
   constructor(props: Props) {
     super(props);
     this.playlistSrv = this.props.$injector.get('playlistSrv');
+    this.isTimeLocked = store.getBool('grafana.dashNav.timeLocked', false);
   }
 
   onFolderNameClick = () => {
@@ -111,6 +115,20 @@ class DashNav extends PureComponent<Props> {
       query: { search: 'open' },
       partial: true,
     });
+  };
+
+  onTimeLock = () => {
+    store.set('grafana.dashNav.timeLocked', true);
+    store.setObject('grafana.dashNav.timeLocked.time', getTimeSrv().time);
+    this.isTimeLocked = true;
+    this.forceUpdate();
+  };
+
+  onTimeUnlock = () => {
+    store.delete('grafana.dashNav.timeLocked');
+    store.delete('grafana.dashNav.timeLocked.time');
+    this.isTimeLocked = false;
+    this.forceUpdate();
   };
 
   addCustomContent(actions: DashNavButtonModel[], buttons: ReactNode[]) {
@@ -315,6 +333,23 @@ class DashNav extends PureComponent<Props> {
 
         {!dashboard.timepicker.hidden && (
           <div className="navbar-buttons">
+            {/* {!this.props.location.timeLocked && ( */}
+            {!this.isTimeLocked && (
+              <DashNavButton
+                tooltip="Go to next dashboard"
+                classSuffix="tight"
+                icon="unlock"
+                onClick={this.onTimeLock}
+              />
+            )}
+            {this.isTimeLocked && (
+              <DashNavButton
+                tooltip="Go to next dashboard"
+                classSuffix="locked"
+                icon="lock"
+                onClick={this.onTimeUnlock}
+              />
+            )}
             <DashNavTimeControls dashboard={dashboard} location={location} updateLocation={updateLocation} />
           </div>
         )}
