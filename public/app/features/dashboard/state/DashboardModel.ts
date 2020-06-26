@@ -176,6 +176,7 @@ export class DashboardModel {
       meta.canDelete = false;
       meta.canSave = false;
     }
+    meta.canEdit = true;
 
     this.meta = meta;
   }
