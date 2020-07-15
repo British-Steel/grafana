@@ -27,6 +27,7 @@ export class SettingsCtrl {
   hasUnsavedFolderChange: boolean;
   selectors: typeof selectors.pages.Dashboard.Settings.General;
   useAngularTemplating: boolean;
+  menus: any[];
 
   /** @ngInject */
   constructor(
@@ -53,6 +54,7 @@ export class SettingsCtrl {
     this.canDelete = this.dashboard.meta.canSave;
 
     this.buildSectionList();
+    this.buildMenuList();
     this.onRouteUpdated();
 
     this.$rootScope.onAppEvent(CoreEvents.routeUpdated, this.onRouteUpdated.bind(this), $scope);
@@ -62,6 +64,16 @@ export class SettingsCtrl {
 
     this.selectors = selectors.pages.Dashboard.Settings.General;
     this.useAngularTemplating = !getConfig().featureToggles.newVariables;
+  }
+
+  async buildMenuList() {
+    this.menus = [];
+
+    return await backendSrv.search({ type: 'dash-db', folderIds: '1487' }).then(res => {
+      res.forEach(dash => {
+        this.menus.push({ value: dash.uid, text: dash.title });
+      });
+    });
   }
 
   buildSectionList() {

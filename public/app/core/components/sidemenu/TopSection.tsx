@@ -14,6 +14,11 @@ const TopSection: FC<any> = () => {
     icon: 'search',
   };
 
+  const menuLink = {
+    text: 'Menu',
+    icon: 'bars',
+  };
+
   let switchThemeLink = {
     text: 'Switch to dark theme',
     icon: 'moon',
@@ -30,6 +35,10 @@ const TopSection: FC<any> = () => {
     getLocationSrv().update({ query: { search: 'open' }, partial: true });
   };
 
+  const onOpenMenu = () => {
+    getLocationSrv().update({ query: { search: 'menu' }, partial: true });
+  };
+
   const onToggleTheme = () => {
     if (document.cookie.indexOf('grafana_override_theme=') >= 0) {
       const date = new Date();
@@ -44,6 +53,7 @@ const TopSection: FC<any> = () => {
 
   return (
     <div className="sidemenu__top">
+      <TopSectionItem link={menuLink} onClick={onOpenMenu} />
       <TopSectionItem link={searchLink} onClick={onOpenSearch} />
       {mainLinks.map((link, index) => {
         return <TopSectionItem link={link} key={`${link.id}-${index}`} />;
