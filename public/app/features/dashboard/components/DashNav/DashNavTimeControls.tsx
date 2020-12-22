@@ -14,16 +14,49 @@ import { updateTimeZoneForSession } from 'app/features/profile/state/reducers';
 // Components
 import { RefreshPicker, withTheme, stylesFactory, Themeable, defaultIntervals } from '@grafana/ui';
 import { TimePickerWithHistory } from 'app/core/components/TimePicker/TimePickerWithHistory';
+import { DefaultTimeButton } from './DefaultTimeButton';
 
 // Utils & Services
 import { getTimeSrv } from 'app/features/dashboard/services/TimeSrv';
 import { appEvents } from 'app/core/core';
+import store from 'app/core/store';
 
 const getStyles = stylesFactory((theme: GrafanaTheme) => {
   return {
     container: css`
       position: relative;
       display: flex;
+    `,
+  };
+});
+
+const getLockStyles = stylesFactory((theme: GrafanaTheme) => {
+  return {
+    container: css`
+      position: relative;
+      display: flex;
+      button,
+      .navbar-button--attached {
+        .fa {
+          font-size: 14px;
+        }
+
+        border: 1px solid ${theme.palette.orangeDark};
+        background-image: none;
+        background-color: transparent;
+        color: ${theme.palette.orangeDark} !important;
+
+        &:focus {
+          background-color: transparent;
+        }
+        i {
+          text-shadow: none;
+          background: linear-gradient(180deg, #f05a28 30%, #fbca0a 100%);
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
+          -moz-text-fill-color: transparent;
+        }
+      }
     `,
   };
 });
@@ -96,17 +129,41 @@ class UnthemedDashNavTimeControls extends Component<Props> {
     appEvents.emit(CoreEvents.zoomOut, 2);
   };
 
+  onDefaultTimeRange = () => {
+    appEvents.emit(CoreEvents.defaultTime);
+  };
+
   render() {
     const { dashboard, theme } = this.props;
+    const defaultTimeButton = <DefaultTimeButton onClick={this.onDefaultTimeRange} />;
     const { refresh_intervals } = dashboard.timepicker;
     const intervals = getTimeSrv().getValidIntervals(refresh_intervals || defaultIntervals);
 
     const timePickerValue = getTimeSrv().timeRange();
     const timeZone = dashboard.getTimezone();
     const styles = getStyles(theme);
+    const lockStyles = getLockStyles(theme);
+
+    // If range>1 day, don't allow refresh interval to be set, kills datasource
+    let refresh = dashboard.refresh;
+    let refreshOff = false;
+    if (timePickerValue.to.valueOf() - timePickerValue.from.valueOf() > 86400000) {
+      refresh = 'Off';
+      getTimeSrv().setAutoRefresh('');
+      refreshOff = true;
+    }
+
+    let style = styles;
+    // time locked don't allow refresh intervel to be set
+    if (store.getBool('grafana.dashNav.timeLocked', false)) {
+      refresh = 'Off';
+      getTimeSrv().setAutoRefresh('');
+      refreshOff = true;
+      style = lockStyles;
+    }
 
     return (
-      <div className={styles.container}>
+      <div className={style.container}>
         <TimePickerWithHistory
           value={timePickerValue}
           onChange={this.onChangeTimePicker}
@@ -115,13 +172,16 @@ class UnthemedDashNavTimeControls extends Component<Props> {
           onMoveForward={this.onMoveForward}
           onZoom={this.onZoom}
           onChangeTimeZone={this.onChangeTimeZone}
+          defaultTimeButton={defaultTimeButton}
+          isLocked={store.getBool('grafana.dashNav.timeLocked', false)}
         />
         <RefreshPicker
           onIntervalChanged={this.onChangeRefreshInterval}
           onRefresh={this.onRefresh}
-          value={dashboard.refresh}
+          value={refresh}
           intervals={intervals}
           tooltip="Refresh dashboard"
+          refreshOff={refreshOff}
         />
       </div>
     );

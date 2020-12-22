@@ -42,6 +42,7 @@ export interface DashboardLink {
   type: DashboardLinkType;
   url: string;
   asDropdown: boolean;
+  excludeCurrent: boolean;
   tags: any[];
   searchHits?: any[];
   targetBlank: boolean;
@@ -58,6 +59,7 @@ export class DashboardModel {
   timezone: any;
   editable: any;
   graphTooltip: any;
+  menuId: any;
   time: any;
   private originalTime: any;
   timepicker: any;
@@ -113,6 +115,7 @@ export class DashboardModel {
     this.timezone = data.timezone || '';
     this.editable = data.editable !== false;
     this.graphTooltip = data.graphTooltip || 0;
+    this.menuId = data.menuId || 0;
     this.time = data.time || { from: 'now-6h', to: 'now' };
     this.timepicker = data.timepicker || {};
     this.templating = this.ensureListExist(data.templating);
@@ -127,6 +130,7 @@ export class DashboardModel {
 
     this.resetOriginalVariables(true);
     this.resetOriginalTime();
+    this.getOriginalTime();
 
     this.initMeta(meta);
     this.updateSchema(data);
@@ -174,6 +178,7 @@ export class DashboardModel {
       meta.canDelete = false;
       meta.canSave = false;
     }
+    meta.canEdit = true;
 
     this.meta = meta;
   }
@@ -925,6 +930,10 @@ export class DashboardModel {
 
   resetOriginalTime() {
     this.originalTime = _.cloneDeep(this.time);
+  }
+
+  getOriginalTime() {
+    return _.cloneDeep(this.originalTime);
   }
 
   hasTimeChanged() {

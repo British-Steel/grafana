@@ -30,7 +30,7 @@ func TestNotifications(t *testing.T) {
 
 			sentMsg := <-ns.mailQueue
 			So(sentMsg.Body, ShouldContainSubstring, "body")
-			So(sentMsg.Subject, ShouldEqual, "Reset your Grafana password - asd@asd.com")
+			So(sentMsg.Subject, ShouldEqual, "Reset your PCC MI password - asd@asd.com")
 			So(sentMsg.Body, ShouldNotContainSubstring, "Subject")
 		})
 	})

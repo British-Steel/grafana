@@ -11,9 +11,10 @@ import { ClickOutsideWrapper } from '../ClickOutsideWrapper/ClickOutsideWrapper'
 // Utils & Services
 import { stylesFactory } from '../../themes/stylesFactory';
 import { withTheme, useTheme } from '../../themes/ThemeContext';
+import { toDuration } from '@grafana/data';
 
 // Types
-import { isDateTime, rangeUtil, GrafanaTheme, dateTimeFormat, timeZoneFormatUserFriendly } from '@grafana/data';
+import { rangeUtil, GrafanaTheme, dateTimeFormat, timeZoneFormatUserFriendly } from '@grafana/data';
 import { TimeRange, TimeZone, dateMath } from '@grafana/data';
 import { Themeable } from '../../types';
 import { otherOptions, quickOptions } from './rangeOptions';
@@ -62,12 +63,14 @@ export interface Props extends Themeable {
   timeZone?: TimeZone;
   timeSyncButton?: JSX.Element;
   isSynced?: boolean;
+  defaultTimeButton?: JSX.Element;
   onChange: (timeRange: TimeRange) => void;
   onChangeTimeZone: (timeZone: TimeZone) => void;
   onMoveBackward: () => void;
   onMoveForward: () => void;
   onZoom: () => void;
   history?: TimeRange[];
+  isLocked?: boolean;
 }
 
 export interface State {
@@ -85,10 +88,13 @@ export class UnthemedTimeRangePicker extends PureComponent<Props, State> {
   };
 
   onOpen = (event: FormEvent<HTMLButtonElement>) => {
-    const { isOpen } = this.state;
-    event.stopPropagation();
-    event.preventDefault();
-    this.setState({ isOpen: !isOpen });
+    if (!this.props.isLocked) {
+      event.stopPropagation();
+      const { isOpen } = this.state;
+      this.setState({ isOpen: !isOpen });
+      event.stopPropagation();
+      this.setState({ isOpen: !isOpen });
+    }
   };
 
   onClose = () => {
@@ -104,6 +110,7 @@ export class UnthemedTimeRangePicker extends PureComponent<Props, State> {
       timeZone,
       timeSyncButton,
       isSynced,
+      defaultTimeButton,
       theme,
       history,
       onChangeTimeZone,
@@ -111,7 +118,7 @@ export class UnthemedTimeRangePicker extends PureComponent<Props, State> {
 
     const { isOpen } = this.state;
     const styles = getStyles(theme);
-    const hasAbsolute = isDateTime(value.raw.from) || isDateTime(value.raw.to);
+    const hasAbsolute = true;
     const syncedTimePicker = timeSyncButton && isSynced;
     const timePickerIconClass = cx({ ['icon-brand-gradient']: syncedTimePicker });
     const timePickerButtonClass = cx('btn navbar-button navbar-button--tight', {
@@ -164,6 +171,7 @@ export class UnthemedTimeRangePicker extends PureComponent<Props, State> {
               <Icon name="search-minus" size="lg" />
             </button>
           </Tooltip>
+          {defaultTimeButton}
         </div>
       </div>
     );
@@ -176,9 +184,53 @@ const ZoomOutTooltip = () => (
   </>
 );
 
+const TimePickerDurationAsString = (timeRange: TimeRange) => {
+  const diff = timeRange.to.diff(timeRange.from);
+  const duration = toDuration(diff);
+  const days = Math.floor(diff / 86400000);
+  let rangeLength = '';
+
+  if (days > 10) {
+    rangeLength += days.toString() + ' days';
+  } else {
+    let lines = 0;
+    const h = duration.hours();
+    const m = duration.minutes();
+    const s = duration.seconds();
+    if (days > 1) {
+      rangeLength += days + ' days';
+      lines++;
+    } else if (days === 1) {
+      rangeLength += '1 day';
+      lines++;
+    }
+    if (h > 0 && lines < 2) {
+      if (lines > 0) {
+        rangeLength += ' ';
+      }
+      rangeLength += h + ' hours';
+      lines++;
+    }
+    if (m > 0 && lines < 2) {
+      if (lines > 0) {
+        rangeLength += ' ';
+      }
+      rangeLength += m + ' minutes';
+      lines++;
+    }
+    if (lines < 1) {
+      rangeLength += duration.asSeconds() + ' seconds';
+    } else if (s > 0 && lines < 2) {
+      rangeLength += ' ' + s + ' seconds';
+    }
+  }
+  return rangeLength;
+};
+
 const TimePickerTooltip = ({ timeRange, timeZone }: { timeRange: TimeRange; timeZone?: TimeZone }) => {
   const theme = useTheme();
   const styles = getLabelStyles(theme);
+  const rangeLength = TimePickerDurationAsString(timeRange);
 
   return (
     <>
@@ -188,6 +240,7 @@ const TimePickerTooltip = ({ timeRange, timeZone }: { timeRange: TimeRange; time
       <div className="text-center">
         <span className={styles.utc}>{timeZoneFormatUserFriendly(timeZone)}</span>
       </div>
+      <div className="text-center">{rangeLength}</div>
     </>
   );
 };

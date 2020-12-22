@@ -4,7 +4,7 @@ import { TimeSeries } from 'app/core/core';
 import { CustomScrollbar, Icon } from '@grafana/ui';
 import { LegendItem, LEGEND_STATS } from './LegendSeriesItem';
 
-type Sort = 'min' | 'max' | 'avg' | 'current' | 'total';
+type Sort = 'min' | 'max' | 'avg' | 'total' | 'current';
 interface LegendProps {
   seriesList: TimeSeries[];
   optionalClass?: string;
@@ -319,9 +319,14 @@ class LegendTableHeaderItem extends PureComponent<LegendTableHeaderProps & Legen
 
   render() {
     const { statName, sort, sortDesc } = this.props;
+    let statNameOver = statName;
+    if (statName === 'current') {
+      statNameOver = '';
+    }
+
     return (
       <th className="pointer" onClick={this.onClick}>
-        {statName}
+        {statNameOver}
         {sort === statName && <Icon name={sortDesc ? 'angle-down' : 'angle-up'} />}
       </th>
     );

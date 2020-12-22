@@ -83,11 +83,11 @@ export class GraphCtrl extends MetricsPanelCtrl {
     // show/hide lines
     lines: true,
     // fill factor
-    fill: 1,
+    fill: 0,
     // fill gradient
     fillGradient: 0,
     // line width in pixels
-    linewidth: 1,
+    linewidth: 2,
     // show/hide dashed line
     dashes: false,
     // show/hide line

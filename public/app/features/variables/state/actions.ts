@@ -1,6 +1,6 @@
 import angular from 'angular';
 import castArray from 'lodash/castArray';
-import { LoadingState, TimeRange, UrlQueryMap, UrlQueryValue } from '@grafana/data';
+import { LoadingState, TimeRange, UrlQueryMap, UrlQueryValue, dateTime } from '@grafana/data';
 
 import {
   DashboardVariableModel,
@@ -443,7 +443,14 @@ export const variableUpdated = (
   emitChangeEvents: boolean
 ): ThunkResult<Promise<void>> => {
   return (dispatch, getState) => {
-    const variableInState = getVariable(identifier.id, getState());
+    const variableInState = getVariable<VariableWithMultiSupport>(identifier.id!, getState());
+
+    // assumes timeControl variable in form yyyy-mm-ddd hh:mm:ss to yyyy-mm-ddd hh:mm:ss
+    if (variableInState.timeControl) {
+      const rangeFrom = dateTime(variableInState.current.text.slice(0, 19)).unix() * 1000;
+      const rangeTo = dateTime(variableInState.current.text.slice(-19)).unix() * 1000;
+      dispatch(updateLocation({ query: { from: rangeFrom, to: rangeTo }, partial: true }));
+    }
 
     // if we're initializing variables ignore cascading update because we are in a boot up scenario
     if (getState().templating.transaction.status === TransactionStatus.Fetching) {

@@ -4,12 +4,14 @@ import { selectors } from '@grafana/e2e-selectors';
 
 import { appEvents, contextSrv, coreModule } from 'app/core/core';
 import { DashboardModel } from '../../state/DashboardModel';
+import { backendSrv } from 'app/core/services/backend_srv';
 import { DashboardSrv } from '../../services/DashboardSrv';
 import { CoreEvents } from 'app/types';
 import { GrafanaRootScope } from 'app/routes/GrafanaCtrl';
 import { AppEvents, locationUtil, TimeZone, urlUtil } from '@grafana/data';
 import { promiseToDigest } from '../../../../core/utils/promiseToDigest';
 import { deleteDashboard } from 'app/features/manage-dashboards/state/actions';
+import './panels';
 
 export class SettingsCtrl {
   dashboard: DashboardModel;
@@ -24,6 +26,7 @@ export class SettingsCtrl {
   hasUnsavedFolderChange: boolean;
   selectors: typeof selectors.pages.Dashboard.Settings.General;
   renderCount: number; // hack to update React when Angular changes
+  menus: any[];
 
   /** @ngInject */
   constructor(
@@ -50,6 +53,7 @@ export class SettingsCtrl {
     this.canDelete = this.dashboard.meta.canSave;
 
     this.buildSectionList();
+    this.buildMenuList();
     this.onRouteUpdated();
 
     this.$rootScope.onAppEvent(CoreEvents.routeUpdated, this.onRouteUpdated.bind(this), $scope);
@@ -59,6 +63,16 @@ export class SettingsCtrl {
 
     this.selectors = selectors.pages.Dashboard.Settings.General;
     this.renderCount = 0;
+  }
+
+  async buildMenuList() {
+    this.menus = [];
+
+    return await backendSrv.search({ type: 'dash-db', folderIds: '1487' }).then(res => {
+      res.forEach(dash => {
+        this.menus.push({ value: dash.uid, text: dash.title });
+      });
+    });
   }
 
   buildSectionList() {
@@ -84,6 +98,11 @@ export class SettingsCtrl {
         title: 'Links',
         id: 'links',
         icon: 'link',
+      });
+      this.sections.push({
+        title: 'Panels',
+        id: 'panels',
+        icon: 'apps',
       });
     }
 

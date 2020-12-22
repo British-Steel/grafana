@@ -307,9 +307,11 @@ export class PanelEditorUnconnected extends PureComponent<Props> {
               <Button onClick={this.onDiscard} variant="secondary" title="Undo all changes">
                 Discard
               </Button>
-              <Button onClick={this.onSaveDashboard} variant="secondary" title="Apply changes and save dashboard">
-                Save
-              </Button>
+              {this.props.dashboard.meta.canSave && (
+                <Button onClick={this.onSaveDashboard} variant="secondary" title="Apply changes and save dashboard">
+                  Save
+                </Button>
+              )}
               <Button onClick={this.onPanelExit} title="Apply changes and go back to dashboard">
                 Apply
               </Button>

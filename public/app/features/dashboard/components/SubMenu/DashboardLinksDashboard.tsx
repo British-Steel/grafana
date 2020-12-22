@@ -15,7 +15,7 @@ interface Props {
 }
 
 export const DashboardLinksDashboard: React.FC<Props> = props => {
-  const { link, linkInfo } = props;
+  const { link, linkInfo, dashboardId } = props;
   const listRef = useRef<HTMLUListElement>(null);
   const [opened, setOpened] = useState(0);
   const resolvedLinks = useResolvedLinks(props, opened);
@@ -36,6 +36,13 @@ export const DashboardLinksDashboard: React.FC<Props> = props => {
           <ul className={`dropdown-menu ${getDropdownLocationCssClass(listRef.current)}`} role="menu" ref={listRef}>
             {resolvedLinks.length > 0 &&
               resolvedLinks.map((resolvedLink, index) => {
+                if (dashboardId === resolvedLink.id) {
+                  return (
+                    <li key={`dashlinks-dropdown-item-${resolvedLink.id}-${index}`} className="current">
+                      {resolvedLink.title}
+                    </li>
+                  );
+                }
                 return (
                   <li key={`dashlinks-dropdown-item-${resolvedLink.id}-${index}`}>
                     <a
@@ -133,16 +140,14 @@ export function resolveLinks(
     sanitizeUrl,
   }
 ): ResolvedLinkDTO[] {
-  return searchHits
-    .filter(searchHit => searchHit.id !== dashboardId)
-    .map(searchHit => {
-      const id = searchHit.id;
-      const title = dependencies.sanitize(searchHit.title);
-      const resolvedLink = dependencies.getLinkSrv().getLinkUrl({ ...link, url: searchHit.url });
-      const url = dependencies.sanitizeUrl(resolvedLink);
+  return searchHits.map(searchHit => {
+    const id = searchHit.id;
+    const title = dependencies.sanitize(searchHit.title);
+    const resolvedLink = dependencies.getLinkSrv().getLinkUrl({ ...link, url: searchHit.url });
+    const url = dependencies.sanitizeUrl(resolvedLink);
 
-      return { id, title, url };
-    });
+    return { id, title, url };
+  });
 }
 
 function getDropdownLocationCssClass(element: HTMLElement | null) {

@@ -72,6 +72,13 @@
     border-bottom: 1px solid $dropdownDividerBottom;
   }
 
+  .current {
+    @include left-brand-border-gradient();
+    padding: 3px 20px 3px 15px;
+    color: $text-color-faint;
+    background: $input-label-bg;
+  }
+
   // Links within the dropdown menu
   > li {
     > a {

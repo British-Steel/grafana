@@ -145,6 +145,8 @@ export const thresholdChanged = eventFactory<ThresholdChangedPayload>('threshold
 
 export const zoomOut = eventFactory<number>('zoom-out');
 
+export const defaultTime = eventFactory<number>('defaulTime');
+
 export const shiftTime = eventFactory<number>('shift-time');
 
 export const elasticQueryUpdated = eventFactory('elastic-query-updated');

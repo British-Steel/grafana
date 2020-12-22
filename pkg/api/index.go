@@ -413,6 +413,14 @@ func (hs *HTTPServer) setIndexViewData(c *models.ReqContext) (*dtos.IndexViewDat
 		data.User.Name = data.User.Login
 	}
 
+	if prefs.Theme == darkName && c.GetCookie("grafana_override_theme") == "true" {
+		data.User.LightTheme = true
+		data.Theme = lightName
+	} else if prefs.Theme == lightName && c.GetCookie("grafana_override_theme") == "true" {
+		data.User.LightTheme = false
+		data.Theme = darkName
+	}
+
 	themeURLParam := c.Query("theme")
 	if themeURLParam == lightName {
 		data.User.LightTheme = true

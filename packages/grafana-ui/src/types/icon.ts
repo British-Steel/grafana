@@ -116,6 +116,8 @@ export type IconName =
   | 'favorite'
   | 'line-alt'
   | 'sort-amount-down'
+  | 'sun'
+  | 'moon'
   | 'cloud'
   | 'draggabledots'
   | 'folder-upload';
@@ -233,6 +235,8 @@ export const getAvailableIcons = (): IconName[] => [
   'ellipsis-v',
   'favorite',
   'sort-amount-down',
+  'sun',
+  'moon',
   'cloud',
   'draggabledots',
   'folder-upload',
