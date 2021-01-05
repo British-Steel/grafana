@@ -438,6 +438,14 @@ const createGraph = (variables: VariableModel[]) => {
   return g;
 };
 
+const getTimeControlRange = (variableInState: VariableWithMultiSupport): [number, number] => {
+  // assumes timeControl variable in form yyyy-mm-ddd hh:mm:ss to yyyy-mm-ddd hh:mm:ss
+  return [
+    dateTime(variableInState.current.text.slice(0, 19)).unix() * 1000,
+    dateTime(variableInState.current.text.slice(-19)).unix() * 1000,
+  ];
+};
+
 export const variableUpdated = (
   identifier: VariableIdentifier,
   emitChangeEvents: boolean
@@ -445,18 +453,16 @@ export const variableUpdated = (
   return (dispatch, getState) => {
     const variableInState = getVariable<VariableWithMultiSupport>(identifier.id!, getState());
 
-    // assumes timeControl variable in form yyyy-mm-ddd hh:mm:ss to yyyy-mm-ddd hh:mm:ss
-    if (variableInState.timeControl) {
-      const rangeFrom = dateTime(variableInState.current.text.slice(0, 19)).unix() * 1000;
-      const rangeTo = dateTime(variableInState.current.text.slice(-19)).unix() * 1000;
-      dispatch(updateLocation({ query: { from: rangeFrom, to: rangeTo }, partial: true }));
-    }
-
     // if we're initializing variables ignore cascading update because we are in a boot up scenario
     if (getState().templating.transaction.status === TransactionStatus.Fetching) {
       if (getVariableRefresh(variableInState) === VariableRefresh.never) {
         // for variable types with updates that go the setValueFromUrl path in the update let's make sure their state is set to Done.
         dispatch(completeVariableLoading(identifier));
+      }
+      // if time control, override from and to from variable (for initial call)
+      if (variableInState.timeControl) {
+        const [rangeFrom, rangeTo] = getTimeControlRange(variableInState);
+        dispatch(updateLocation({ query: { from: rangeFrom, to: rangeTo }, partial: true }));
       }
       return Promise.resolve();
     }
@@ -497,6 +503,7 @@ export const onTimeRangeUpdated = (
   dependencies: OnTimeRangeUpdatedDependencies = { templateSrv: getTemplateSrv() }
 ): ThunkResult<Promise<void>> => async (dispatch, getState) => {
   dependencies.templateSrv.updateTimeRange(timeRange);
+
   const variablesThatNeedRefresh = getVariables(getState()).filter(variable => {
     if (variable.hasOwnProperty('refresh') && variable.hasOwnProperty('options')) {
       const variableWithRefresh = (variable as unknown) as QueryVariableModel;
@@ -575,6 +582,13 @@ const getQueryWithVariables = (getState: () => StoreState): UrlQueryMap => {
       continue;
     }
 
+    const variableInState = getVariable<VariableWithMultiSupport>(variable.id!, getState());
+    // if time control, override from and to from variable
+    if (variableInState.timeControl) {
+      const [rangeFrom, rangeTo] = getTimeControlRange(variableInState);
+      queryParamsNew['from'] = rangeFrom;
+      queryParamsNew['to'] = rangeTo;
+    }
     const adapter = variableAdapters.get(variable.type);
     queryParamsNew['var-' + variable.name] = adapter.getValueForUrl(variable);
   }
